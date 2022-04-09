@@ -33,8 +33,10 @@ const Browse = ({ navigation, route }) => {
 
   return (
     <SafeAreaView>
-      <View style={{ padding: 20 }}>
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Styles</Text>
+      <View>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Styles</Text>
+        </View>
         <FlatList
           keyExtractor={(item, index) => index}
           data={categories}
@@ -43,10 +45,12 @@ const Browse = ({ navigation, route }) => {
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      <View style={{ padding: 20 }}>
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          Establishment Type
-        </Text>
+      <View>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            Establishment Type
+          </Text>
+        </View>
         <FlatList
           keyExtractor={(item, index) => index}
           data={establishments}
