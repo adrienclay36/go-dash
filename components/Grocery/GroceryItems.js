@@ -32,7 +32,7 @@ const GroceryItems = ({ groceryData, navigation }) => {
             style={{ marginTop: 10, padding: 15, backgroundColor: "white" }}
           >
             <RestaurantImage image={item.image_url} item={item} favorites={userContext.favorites} />
-            <RestaurantInfo name={item.name} rating={item.rating} />
+            <RestaurantInfo name={item.name} rating={item.rating} isClosed={item.isClosed} />
           </View>
         </TouchableOpacity>
       ))}
@@ -104,7 +104,7 @@ const RestaurantImage = ({ image, favorites, item }) => {
   );
 };
 
-const RestaurantInfo = ({ name, rating }) => (
+const RestaurantInfo = ({ name, rating, isClosed }) => (
   <View
     style={{
       flexDirection: "row",
@@ -119,15 +119,41 @@ const RestaurantInfo = ({ name, rating }) => (
     </View>
     <View
       style={{
-        backgroundColor: "#eee",
-        height: 30,
-        width: 30,
-        alignItems: "center",
-        borderRadius: 15,
+        flexDirection: "row",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Text>{rating}</Text>
+      {isClosed ? (
+        <View
+          style={{ backgroundColor: "#e62538", padding: 10, borderRadius: 15 }}
+        >
+          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
+            Closed
+          </Text>
+        </View>
+      ) : (
+        <View
+          style={{ backgroundColor: "#25e685", padding: 10, borderRadius: 15 }}
+        >
+          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
+            Open
+          </Text>
+        </View>
+      )}
+      <View
+        style={{
+          backgroundColor: "#eee",
+          height: 30,
+          width: 30,
+          alignItems: "center",
+          borderRadius: 15,
+          justifyContent: "center",
+          marginLeft: 10,
+        }}
+      >
+        <Text>{rating}</Text>
+      </View>
     </View>
   </View>
 );

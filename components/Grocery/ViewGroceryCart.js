@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import OrderItem from "../RestaurantDetail/OrderItem";
 import LottieView from "lottie-react-native";
-const ViewGroceryCart = ({ navigation, hideViewButton }) => {
+const ViewGroceryCart = ({ navigation, hideViewButton, rootPage }) => {
   const { groceryCart, restaurantName, groceryCartOpen } = useSelector(
     (state) => state.cartReducer.selectedItems
   );
@@ -71,23 +71,26 @@ const ViewGroceryCart = ({ navigation, hideViewButton }) => {
   });
 
   const addOrderToFirebase = async () => {
-   
-      setModalVisible(false);
-      setLoading(true);
-      loadingRef.current?.play();
-      const userRef = doc(db, "users", auth.currentUser?.email);
-      await updateDoc(userRef, {
-        orders: arrayUnion({
-          items: groceryCart,
-          restaurantName: restaurantName,
-          createdAt: new Date().getTime().toString(),
-          total: totalUSD,
-        }),
-      });
-      dispatch({ type: "CLEAR_GROCERY" });
+    setModalVisible(false);
+    setLoading(true);
+    loadingRef.current?.play();
+    const userRef = doc(db, "users", auth.currentUser?.email);
+    await updateDoc(userRef, {
+      orders: arrayUnion({
+        items: groceryCart,
+        restaurantName: restaurantName,
+        createdAt: new Date().getTime().toString(),
+        total: totalUSD,
+      }),
+    });
+    dispatch({ type: "CLEAR_GROCERY" });
+    dispatch({ type: "CLOSE_GROCERY" });
+    if (rootPage === "GroceryHeader") {
+      navigation.navigate("OrderCompleted", { restaurantName, totalUSD });
+    } else {
       navigation.replace("OrderCompleted", { restaurantName, totalUSD });
-      setLoading(false);
- 
+    }
+    setLoading(false);
   };
 
   useEffect(() => {

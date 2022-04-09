@@ -2,12 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { auth, db } from "../../firebase";
-import {
-  arrayRemove,
-  arrayUnion,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { UserContext } from "../../context/UserContext";
 
 export const localRestaurants = [
@@ -46,7 +41,6 @@ const DEFAULT_IMAGE =
 const RestaurantItems = ({ restaurantData, navigation }) => {
   const userContext = useContext(UserContext);
 
- 
   return (
     <>
       {restaurantData.map((item, index) => (
@@ -69,8 +63,16 @@ const RestaurantItems = ({ restaurantData, navigation }) => {
           <View
             style={{ marginTop: 10, padding: 15, backgroundColor: "white" }}
           >
-            <RestaurantImage image={item.image_url} item={item} favorites={userContext.favorites} />
-            <RestaurantInfo name={item.name} rating={item.rating} />
+            <RestaurantImage
+              image={item.image_url}
+              item={item}
+              favorites={userContext.favorites}
+            />
+            <RestaurantInfo
+              name={item.name}
+              rating={item.rating}
+              isClosed={item.is_closed}
+            />
           </View>
         </TouchableOpacity>
       ))}
@@ -79,10 +81,10 @@ const RestaurantItems = ({ restaurantData, navigation }) => {
 };
 
 const RestaurantImage = ({ image, item, favorites }) => {
+  const foundItem = favorites.some(
+    (favorite) => favorite.restaurant.id === item.id
+  );
 
-  const foundItem = favorites.some((favorite) => favorite.restaurant.id === item.id);
-  
-  
   let displayImage;
   if (image.length) {
     displayImage = image;
@@ -96,21 +98,21 @@ const RestaurantImage = ({ image, item, favorites }) => {
         restaurant: item,
       }),
     });
-  }
+  };
 
   const removeFromFavorites = async () => {
     const userRef = doc(db, "users", auth.currentUser?.email);
-    if(favorites.length === 1) {
+    if (favorites.length === 1) {
       await updateDoc(userRef, {
         favorites: [],
-      })
+      });
     }
     await updateDoc(userRef, {
       favorites: arrayRemove({
         restaurant: item,
       }),
     });
-  }
+  };
   return (
     <>
       <Image
@@ -142,7 +144,7 @@ const RestaurantImage = ({ image, item, favorites }) => {
   );
 };
 
-const RestaurantInfo = ({ name, rating }) => (
+const RestaurantInfo = ({ name, rating, isClosed }) => (
   <View
     style={{
       flexDirection: "row",
@@ -157,15 +159,41 @@ const RestaurantInfo = ({ name, rating }) => (
     </View>
     <View
       style={{
-        backgroundColor: "#eee",
-        height: 30,
-        width: 30,
-        alignItems: "center",
-        borderRadius: 15,
+        flexDirection: "row",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Text>{rating}</Text>
+      {isClosed ? (
+        <View
+          style={{ backgroundColor: "#e62538", padding: 10, borderRadius: 15 }}
+        >
+          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
+            Closed
+          </Text>
+        </View>
+      ) : (
+        <View
+          style={{ backgroundColor: "#25e685", padding: 10, borderRadius: 15 }}
+        >
+          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
+            Open
+          </Text>
+        </View>
+      )}
+      <View
+        style={{
+          backgroundColor: "#eee",
+          height: 30,
+          width: 30,
+          alignItems: "center",
+          borderRadius: 15,
+          justifyContent: "center",
+          marginLeft: 10,
+        }}
+      >
+        <Text>{rating}</Text>
+      </View>
     </View>
   </View>
 );

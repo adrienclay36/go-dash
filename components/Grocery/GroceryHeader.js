@@ -48,7 +48,7 @@ const GroceryHeader = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </View>
-      <ViewGroceryCart navigation={navigation} hideViewButton={true} />
+      <ViewGroceryCart navigation={navigation} hideViewButton={true} rootPage={'GroceryHeader'} />
     </>
   );
 };
