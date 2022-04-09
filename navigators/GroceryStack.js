@@ -3,26 +3,33 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Grocery from "../screens/Grocery/Grocery";
 const Stack = createStackNavigator();
-import RestaurantDetail from "../screens/Home/RestaurantDetail";
+import GroceryDetail from "../screens/Grocery/GroceryDetail";
+import GroceryHeader from "../components/Grocery/GroceryHeader";
+import OrderCompleted from "../screens/Home/OrderCompleted";
 const GroceryStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Image
-              source={{
-                uri: "https://img.icons8.com/color/344/shopping-basket-2.png",
-              }}
-              style={{ width: 30, height: 30 }}
-            />
+        options={({ route }) => ({
+          headerShadowVisible: false,
+          presentation: "formSheet",
+          header: (props) => (
+            <GroceryHeader {...props} props={props} route={route} />
           ),
-         
-        }}
+        })}
         name="Grocery"
         component={Grocery}
       />
-      <Stack.Screen name="GroceryDetail" component={RestaurantDetail} />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="GroceryDetail"
+        component={GroceryDetail}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="OrderCompleted"
+        component={OrderCompleted}
+      />
     </Stack.Navigator>
   );
 };

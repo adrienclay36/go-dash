@@ -1,6 +1,14 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { auth, db } from "../../firebase";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { UserContext } from "../../context/UserContext";
 
 export const localRestaurants = [
   {
@@ -32,7 +40,13 @@ export const localRestaurants = [
   },
 ];
 
+const DEFAULT_IMAGE =
+  "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80";
+
 const RestaurantItems = ({ restaurantData, navigation }) => {
+  const userContext = useContext(UserContext);
+
+ 
   return (
     <>
       {restaurantData.map((item, index) => (
@@ -55,7 +69,7 @@ const RestaurantItems = ({ restaurantData, navigation }) => {
           <View
             style={{ marginTop: 10, padding: 15, backgroundColor: "white" }}
           >
-            <RestaurantImage image={item.image_url} />
+            <RestaurantImage image={item.image_url} item={item} favorites={userContext.favorites} />
             <RestaurantInfo name={item.name} rating={item.rating} />
           </View>
         </TouchableOpacity>
@@ -64,19 +78,69 @@ const RestaurantItems = ({ restaurantData, navigation }) => {
   );
 };
 
-const RestaurantImage = ({ image }) => (
-  <>
-    <Image
-      source={{
-        uri: image,
-      }}
-      style={{ width: "100%", height: 180 }}
-    />
-    <TouchableOpacity style={{ position: "absolute", right: 20, top: 20 }}>
-      <MaterialCommunityIcons name="heart-outline" size={25} color="#ffffff" />
-    </TouchableOpacity>
-  </>
-);
+const RestaurantImage = ({ image, item, favorites }) => {
+
+  const foundItem = favorites.some((favorite) => favorite.restaurant.id === item.id);
+  
+  
+  let displayImage;
+  if (image.length) {
+    displayImage = image;
+  } else {
+    displayImage = DEFAULT_IMAGE;
+  }
+  const addToFavorites = async () => {
+    const userRef = doc(db, "users", auth.currentUser?.email);
+    await updateDoc(userRef, {
+      favorites: arrayUnion({
+        restaurant: item,
+      }),
+    });
+  }
+
+  const removeFromFavorites = async () => {
+    const userRef = doc(db, "users", auth.currentUser?.email);
+    if(favorites.length === 1) {
+      await updateDoc(userRef, {
+        favorites: [],
+      })
+    }
+    await updateDoc(userRef, {
+      favorites: arrayRemove({
+        restaurant: item,
+      }),
+    });
+  }
+  return (
+    <>
+      <Image
+        source={{
+          uri: displayImage,
+        }}
+        style={{ width: "100%", height: 180 }}
+      />
+      {foundItem ? (
+        <TouchableOpacity
+          onPress={removeFromFavorites}
+          style={{ position: "absolute", right: 25, top: 25 }}
+        >
+          <MaterialCommunityIcons name={"heart"} size={30} color="#ed2d53" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          onPress={addToFavorites}
+          style={{ position: "absolute", right: 25, top: 25 }}
+        >
+          <MaterialCommunityIcons
+            name={"heart-outline"}
+            size={30}
+            color="#ffffff"
+          />
+        </TouchableOpacity>
+      )}
+    </>
+  );
+};
 
 const RestaurantInfo = ({ name, rating }) => (
   <View

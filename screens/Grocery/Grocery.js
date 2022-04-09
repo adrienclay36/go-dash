@@ -1,15 +1,11 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
-import HeaderTabs from "../../components/Home/HeaderTabs";
 import SearchBar from "../../components/Home/SearchBar";
 import Categories from "../../components/Home/Categories";
-import RestaurantItems from "../../components/Home/RestaurantItems";
 import GroceryItems from "../../components/Grocery/GroceryItems";
-import { localRestaurants } from "../../components/Home/RestaurantItems";
-import BottomTabs from "../../components/BottomTabs";
 import { YELP_API_KEY } from "@env";
-import { Divider } from "react-native-elements";
+
 import LottieView from "lottie-react-native";
 import * as Location from "expo-location";
 
@@ -18,8 +14,10 @@ const Grocery = ({ navigation }) => {
   const [city, setCity] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("Delivery");
+  const [business, setBusiness] = useState("");
   const [init, setInit] = useState(true);
   const animationRef = useRef(null);
+
   const getGroceryData = async (inputCity) => {
     const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=grocery&location=${inputCity}&limit=50`;
 
@@ -31,6 +29,28 @@ const Grocery = ({ navigation }) => {
 
     const response = await fetch(yelpUrl, apiOptions);
     const data = await response.json();
+    setGroceryData(data.businesses);
+
+    if (init) {
+      setInit(false);
+    }
+    setLoading(false);
+  };
+
+  const findBusiness = async (businessTerm, inputCity) => {
+    
+    setLoading(true);
+    const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=${businessTerm}&category=grocery&location=${inputCity}&limit=50`;
+
+    const apiOptions = {
+      headers: {
+        Authorization: `Bearer ${YELP_API_KEY}`,
+      },
+    };
+
+    const response = await fetch(yelpUrl, apiOptions);
+    const data = await response.json();
+
     setGroceryData(data.businesses);
 
     if (init) {
@@ -91,6 +111,20 @@ const Grocery = ({ navigation }) => {
     }
   }, [city, activeTab]);
 
+  useEffect(() => {
+    if (!init && business.length > 0) {
+      const timeout = setTimeout(() => {
+        findBusiness(business, city);
+      }, 500);
+      
+      return () => clearTimeout(timeout);
+    }
+    if (business.length === 0 && !init) {
+      
+      getGroceryData(city);
+    }
+  }, [business]);
+
   const loadingAnimation = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <LottieView
@@ -106,8 +140,11 @@ const Grocery = ({ navigation }) => {
     <SafeAreaView style={{ backgroundColor: "#eee", flex: 1 }}>
       <View style={{ backgroundColor: "white", padding: 15 }}>
         <StatusBar style="dark" />
-        {/* <HeaderTabs activeTab={activeTab} setActiveTab={setActiveTab} /> */}
-        <SearchBar setCity={setCity} />
+        <SearchBar
+          setCity={setCity}
+          setBusiness={setBusiness}
+          business={business}
+        />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Categories />

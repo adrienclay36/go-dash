@@ -89,6 +89,7 @@ const SignUpScreen = ({ navigation, route }) => {
         displayName: displayName.toLowerCase(),
         photoURL: PHOTO_URL,
         orders: [],
+        favorites: [],
         location: [{ ...locationObj, label: "Home" }],
       });
     } catch (err) {

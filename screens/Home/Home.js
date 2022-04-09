@@ -1,29 +1,30 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import HeaderTabs from "../../components/Home/HeaderTabs";
 import SearchBar from "../../components/Home/SearchBar";
 import Categories from "../../components/Home/Categories";
 import RestaurantItems from "../../components/Home/RestaurantItems";
-import { localRestaurants } from "../../components/Home/RestaurantItems";
-import BottomTabs from "../../components/BottomTabs";
 import { YELP_API_KEY } from "@env";
-import { Divider } from "react-native-elements";
 import LottieView from "lottie-react-native";
 import * as Location from "expo-location";
-
-
+import { UserContext } from "../../context/UserContext";
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from "../../firebase";
 const Home = ({ navigation }) => {
   const [restaurantData, setRestaurantData] = useState([]);
   const [city, setCity] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("Delivery");
   const [init, setInit] = useState(true);
+  const [business, setBusiness] = useState("");
   const animationRef = useRef(null);
+
+  
+
   const getRestaurants = async (inputCity) => {
-    
     const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=restaurants&location=${inputCity}&limit=50`;
-    
+
     const apiOptions = {
       headers: {
         Authorization: `Bearer ${YELP_API_KEY}`,
@@ -37,9 +38,37 @@ const Home = ({ navigation }) => {
         business.transactions.includes(activeTab.toLowerCase())
       )
     );
-    
-    
-    if(init) {
+
+    if (init) {
+      setInit(false);
+    }
+    setLoading(false);
+  };
+
+  const findBusiness = async (businessTerm, inputCity) => {
+    setLoading(true);
+    const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=${businessTerm}&category=restaurants&location=${inputCity}&limit=50`;
+
+    const apiOptions = {
+      headers: {
+        Authorization: `Bearer ${YELP_API_KEY}`,
+      },
+    };
+
+    const response = await fetch(yelpUrl, apiOptions);
+    const data = await response.json();
+    console.log(data);
+    if (!data?.error) {
+      setRestaurantData(
+        data.businesses.filter((business) =>
+          business.transactions.includes(activeTab.toLowerCase())
+        )
+      );
+    } else {
+      setRestaurantData([]);
+    }
+
+    if (init) {
       setInit(false);
     }
     setLoading(false);
@@ -92,17 +121,27 @@ const Home = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    if(!init) {
+    if (!init) {
       getRestaurants(city);
     }
-  }, [city, activeTab])
+  }, [city, activeTab]);
 
-
+  useEffect(() => {
+    if (!init && business.length > 0) {
+      const timeout = setTimeout(() => {
+        findBusiness(business, city);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+    if (business.length === 0  && !init) {
+      getRestaurants(city);
+    }
+  }, [business]);
 
   const loadingAnimation = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <LottieView
-        speed={2} 
+        speed={2}
         style={{ height: 350, width: 350 }}
         source={require("../../assets/animations/motor-loader.json")}
         ref={animationRef}
@@ -115,14 +154,19 @@ const Home = ({ navigation }) => {
       <View style={{ backgroundColor: "white", padding: 15 }}>
         <StatusBar style="dark" />
         <HeaderTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        <SearchBar setCity={setCity} />
+        <SearchBar setCity={setCity} setBusiness={setBusiness} business={business}/>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Categories />
-        {loading ? loadingAnimation : <RestaurantItems
-          restaurantData={restaurantData}
-          navigation={navigation}
-        />}
+        {loading ? (
+          loadingAnimation
+        ) : (
+          <RestaurantItems
+            restaurantData={restaurantData}
+            navigation={navigation}
+            
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

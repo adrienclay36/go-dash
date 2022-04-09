@@ -6,7 +6,7 @@ import Browse from '../screens/Browse/Browse';
 const BrowseStack = () => {
   return (
     <Stack.Navigator>
-        <Stack.Screen name="Browse" component={Browse}/>
+        <Stack.Screen options={{ headerShown: false }} name="Browse" component={Browse}/>
     </Stack.Navigator>
   )
 }

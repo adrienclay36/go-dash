@@ -11,15 +11,15 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import OrderItem from "./OrderItem";
+import OrderItem from "../RestaurantDetail/OrderItem";
 import LottieView from "lottie-react-native";
-const ViewCart = ({ navigation }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const loadingRef = useRef(null);
-  const { items, restaurantName } = useSelector(
+const ViewGroceryCart = ({ navigation, hideViewButton }) => {
+  const { groceryCart, restaurantName, groceryCartOpen } = useSelector(
     (state) => state.cartReducer.selectedItems
   );
+  const [modalVisible, setModalVisible] = useState(groceryCartOpen);
+  const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const ViewCart = ({ navigation }) => {
     };
   }, [loading]);
 
-  const total = items
+  const total = groceryCart
     .map((item) => Number(item.price.replace("$", "")))
     .reduce((prev, curr) => prev + curr, 0);
   const totalUSD = total.toLocaleString("en", {
@@ -71,23 +71,32 @@ const ViewCart = ({ navigation }) => {
   });
 
   const addOrderToFirebase = async () => {
-    setModalVisible(false);
-    setLoading(true);
-    loadingRef.current?.play();
-    const ordersCol = collection(db, "orders");
-    const userRef = doc(db, "users", auth.currentUser?.email);
-    await updateDoc(userRef, {
-      orders: arrayUnion({
-        items: items,
-        restaurantName: restaurantName,
-        createdAt: new Date().getTime().toString(),
-        total: totalUSD,
-      }),
-    });
-    dispatch({ type: "CLEAR_CART" });
-    navigation.replace("OrderCompleted", { restaurantName, totalUSD });
-    setLoading(false);
+   
+      setModalVisible(false);
+      setLoading(true);
+      loadingRef.current?.play();
+      const userRef = doc(db, "users", auth.currentUser?.email);
+      await updateDoc(userRef, {
+        orders: arrayUnion({
+          items: groceryCart,
+          restaurantName: restaurantName,
+          createdAt: new Date().getTime().toString(),
+          total: totalUSD,
+        }),
+      });
+      dispatch({ type: "CLEAR_GROCERY" });
+      navigation.replace("OrderCompleted", { restaurantName, totalUSD });
+      setLoading(false);
+ 
   };
+
+  useEffect(() => {
+    if (groceryCartOpen) {
+      setModalVisible(true);
+    } else if (!groceryCartOpen) {
+      setModalVisible(false);
+    }
+  }, [groceryCartOpen]);
 
   const checkoutModalContent = (setModalVisible) => {
     return (
@@ -95,7 +104,7 @@ const ViewCart = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalCheckoutContainer}>
             <Text style={styles.restaurantName}>{restaurantName}</Text>
-            {items.map((item, index) => (
+            {groceryCart.map((item, index) => (
               <OrderItem key={index} item={item} />
             ))}
             <View style={styles.subtotalContainer}>
@@ -129,9 +138,19 @@ const ViewCart = ({ navigation }) => {
                 </Text>
               </TouchableOpacity>
             </View>
-            <View style={{ width: "70%", justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+            <View
+              style={{
+                width: "70%",
+                justifyContent: "center",
+                alignItems: "center",
+                alignSelf: "center",
+              }}
+            >
               <TouchableOpacity
-              onPress={() => setModalVisible(false)}
+                onPress={() => {
+                  dispatch({ type: "CLOSE_GROCERY" });
+                  setModalVisible(false);
+                }}
                 style={{
                   justifyContent: "center",
                   alignItem: "center",
@@ -141,7 +160,15 @@ const ViewCart = ({ navigation }) => {
                   marginTop: 30,
                 }}
               >
-                <Text style={{ textAlign: "center", color: 'white', fontWeight: 'bold' }}>Keep Browsing</Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Keep Browsing
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -170,34 +197,36 @@ const ViewCart = ({ navigation }) => {
             zIndex: 999,
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              disabled={loading}
+          {!hideViewButton && (
+            <View
               style={{
-                marginTop: 20,
-                backgroundColor: "black",
-                alignItems: "center",
-                padding: 15,
-                borderRadius: 30,
-                width: 300,
-                position: "relative",
                 flexDirection: "row",
-                justifyContent: "flex-end",
+                justifyContent: "center",
+                width: "100%",
               }}
             >
-              <Text style={{ color: "white", fontSize: 20, marginRight: 40 }}>
-                View Cart
-              </Text>
-              <Text style={{ color: "white", fontSize: 20 }}>{totalUSD}</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                disabled={loading}
+                style={{
+                  marginTop: 20,
+                  backgroundColor: "black",
+                  alignItems: "center",
+                  padding: 15,
+                  borderRadius: 30,
+                  width: 300,
+                  position: "relative",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 20, marginRight: 40 }}>
+                  View Cart
+                </Text>
+                <Text style={{ color: "white", fontSize: 20 }}>{totalUSD}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       ) : null}
       {loading ? (
@@ -227,4 +256,4 @@ const ViewCart = ({ navigation }) => {
   );
 };
 
-export default ViewCart;
+export default ViewGroceryCart;
