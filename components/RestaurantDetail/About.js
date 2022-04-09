@@ -10,7 +10,7 @@ const About = ({ route }) => {
   
   return (
     <View>
-      <RestaurantImage image={image} />
+      {/* <RestaurantImage image={image} /> */}
       <RestaurantTitle name={name} />
       <RestaurantDescription description={description} />
     </View>
@@ -18,7 +18,7 @@ const About = ({ route }) => {
 };
 
 const RestaurantImage = (props) => (
-  <Image source={{ uri: props.image }} style={{ width: "100%", height: 180 }} />
+  <Image source={{ uri: props.image }} style={{ width: "100%", height: 100 }} />
 );
 
 const RestaurantTitle = (props) => (

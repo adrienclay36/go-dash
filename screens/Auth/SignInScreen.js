@@ -34,13 +34,18 @@ const loginFormSchema = Yup.object().shape({
 
 const SignInScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
+  const [noUser, setNoUser] = useState(false);
 
   const signInHandler = async (email, password) => {
+    setNoUser(false);
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.log(error.message);
+      if (error.message === "Firebase: Error (auth/user-not-found).") {
+        Keyboard.dismiss();
+        setNoUser(true);
+      }
       setLoading(false);
     }
   };
@@ -144,6 +149,17 @@ const SignInScreen = ({ navigation, route }) => {
                         onBlur={handleBlur("password")}
                         secureTextEntry={true}
                       />
+                    </View>
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginBottom: 10,
+                      }}
+                    >
+                      {noUser && (
+                        <Text style={{ color: "red" }}>That user doesn't exist</Text>
+                      )}
                     </View>
                     <TouchableOpacity
                       onPress={handleSubmit}

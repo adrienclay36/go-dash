@@ -3,7 +3,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSelector, useDispatch } from "react-redux";
 import { auth, db } from "../../firebase";
-import { addDoc, arrayUnion, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import OrderItem from "./OrderItem";
 import LottieView from "lottie-react-native";
 const ViewCart = ({ navigation }) => {
@@ -68,7 +75,7 @@ const ViewCart = ({ navigation }) => {
     setLoading(true);
     loadingRef.current?.play();
     const ordersCol = collection(db, "orders");
-    const userRef = doc(db, 'users', auth.currentUser?.email);
+    const userRef = doc(db, "users", auth.currentUser?.email);
     await updateDoc(userRef, {
       orders: arrayUnion({
         items: items,
@@ -76,13 +83,13 @@ const ViewCart = ({ navigation }) => {
         createdAt: new Date().getTime().toString(),
         total: totalUSD,
       }),
-    })
+    });
     dispatch({ type: "CLEAR_CART" });
     navigation.replace("OrderCompleted", { restaurantName, totalUSD });
     setLoading(false);
   };
 
-  const checkoutModalContent = () => {
+  const checkoutModalContent = (setModalVisible) => {
     return (
       <>
         <View style={styles.modalContainer}>
@@ -122,6 +129,21 @@ const ViewCart = ({ navigation }) => {
                 </Text>
               </TouchableOpacity>
             </View>
+            <View style={{ width: "70%", justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+              <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+                style={{
+                  justifyContent: "center",
+                  alignItem: "center",
+                  backgroundColor: "black",
+                  padding: 20,
+                  borderRadius: 20,
+                  marginTop: 30,
+                }}
+              >
+                <Text style={{ textAlign: "center", color: 'white', fontWeight: 'bold' }}>Keep Browsing</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </>
@@ -135,7 +157,7 @@ const ViewCart = ({ navigation }) => {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        {checkoutModalContent()}
+        {checkoutModalContent(setModalVisible)}
       </Modal>
       {total ? (
         <View
@@ -144,7 +166,7 @@ const ViewCart = ({ navigation }) => {
             alignItems: "center",
             flexDirection: "row",
             position: "absolute",
-            bottom: 350,
+            bottom: 20,
             zIndex: 999,
           }}
         >

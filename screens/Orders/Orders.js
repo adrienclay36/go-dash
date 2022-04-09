@@ -12,6 +12,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 const Orders = ({ navigation }) => {
   const [userOrders, setUserOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const userDoc = doc(db, "users", auth.currentUser?.email);
@@ -29,10 +30,15 @@ const Orders = ({ navigation }) => {
     });
     return () => unsub();
   }, []);
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       {userOrders?.map((order, index) => (
-        <OrderItem key={order.createdAt} order={order} navigation={navigation} />
+        <OrderItem
+          key={order.createdAt}
+          order={order}
+          navigation={navigation}
+        />
       ))}
     </ScrollView>
   );
@@ -44,7 +50,9 @@ const OrderItem = ({ order, navigation }) => {
   );
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("OrderDetails", { order })}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("OrderDetails", { order })}
+    >
       <View style={styles.orderItemContainer}>
         <View
           style={{

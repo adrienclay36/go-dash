@@ -59,6 +59,7 @@ const SignUpScreen = ({ navigation, route }) => {
     setLoading(true);
     const permissions = await getLocationPermissions();
     let regionName;
+    let locationObj
     if (permissions) {
       const location = await Location.getCurrentPositionAsync();
 
@@ -66,26 +67,29 @@ const SignUpScreen = ({ navigation, route }) => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
+      locationObj = regionName[0];
     } else {
-      regionName = "San Diego";
+      regionName = [{
+        city: 'San Francisco',
+      }];
+      locationObj = regionName[0];
     }
-    
 
     await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(auth.currentUser, {
       displayName,
       photoURL: PHOTO_URL,
     });
-
+    
     try {
       const usersRef = doc(db, "users", auth.currentUser?.email);
       await setDoc(usersRef, {
         email: auth?.currentUser?.email,
         owner_id: auth?.currentUser?.uid,
-        displayName: displayName,
+        displayName: displayName.toLowerCase(),
         photoURL: PHOTO_URL,
         orders: [],
-        location: regionName,
+        location: [{ ...locationObj, label: "Home" }],
       });
     } catch (err) {
       console.log(err.message);
@@ -174,6 +178,7 @@ const SignUpScreen = ({ navigation, route }) => {
                       value={values.displayName}
                       onChangeText={handleChange("displayName")}
                       onBlur={handleBlur("displayName")}
+                      editable={!loading}
                     />
                   </View>
 
@@ -199,6 +204,7 @@ const SignUpScreen = ({ navigation, route }) => {
                       value={values.email}
                       onChangeText={handleChange("email")}
                       onBlur={handleBlur("email")}
+                      editable={!loading}
                     />
                   </View>
 
@@ -225,6 +231,7 @@ const SignUpScreen = ({ navigation, route }) => {
                       onChangeText={handleChange("password")}
                       onBlur={handleBlur("password")}
                       secureTextEntry={true}
+                      editable={!loading}
                     />
                   </View>
                   <TouchableOpacity

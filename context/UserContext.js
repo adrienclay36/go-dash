@@ -16,7 +16,7 @@ const UserContextProvider = (props) => {
       if (docSnap.exists()) {
         setUser(docSnap.data());
         setLocation(docSnap.data().location[0]);
-        console.log(docSnap.data().location[0]);
+
       } else {
         setUser(null);
       }

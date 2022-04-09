@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import About from '../../components/RestaurantDetail/About';
-import { Divider } from 'react-native-elements'
-import MenuItems from '../../components/RestaurantDetail/MenuItems'
-import ViewCart from '../../components/RestaurantDetail/ViewCart'
-
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import About from "../../components/RestaurantDetail/About";
+import { Divider } from "react-native-elements";
+import MenuItems from "../../components/RestaurantDetail/MenuItems";
+import ViewCart from "../../components/RestaurantDetail/ViewCart";
+import DetailsMap from "../../components/RestaurantDetail/DetailsMap";
 
 const foods = [
   {
@@ -46,19 +46,23 @@ const foods = [
   },
 ];
 
-
 const RestaurantDetail = ({ navigation, route }) => {
-  
   return (
-    <View>
+    <>
+    <View style={{ flex: .3, }}>
+
+      <DetailsMap coordinates={route?.params?.coordinates} restaurantName={route?.params?.name} />
+    </View>
+    <View style={{ flex: 1 }}>
       <About route={route} />
       <Divider width={1.8} style={{ marginVertical: 20 }} />
       <MenuItems restaurantName={route.params?.name} foods={foods} />
       <ViewCart navigation={navigation} />
     </View>
+    </>
   );
-}
+};
 
-export default RestaurantDetail
+export default RestaurantDetail;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

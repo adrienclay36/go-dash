@@ -29,11 +29,11 @@ const OrderDetails = ({ navigation, route }) => {
         }}
       >
         <View style={{ backgroundColor: 'white', margin: 10, padding: 20, borderRadius: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}>
-            <LottieView ref={animationRef} source={require("../../assets/animations/check-mark.json")} speed={.5} style={{ width: 50, height: 50 }} loop={false}/>
+            <LottieView ref={animationRef} source={require("../../assets/animations/check-mark.json")} speed={.5} style={{ width: 50, height: 50, marginBottom: 20 }} loop={false}/>
           <Text style={{ fontSize: 20, fontWeight: "600" }}>
             Your Order from {order.restaurantName}
           </Text>
-          <Text style={{ fontSize: 20, fontWeight: "600" }}>
+          <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 30 }}>
             on {formatDate}
           </Text>
         </View>

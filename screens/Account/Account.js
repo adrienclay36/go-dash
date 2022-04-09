@@ -7,7 +7,6 @@ import { UserContext } from "../../context/UserContext";
 const Account = () => {
   const userContext = useContext(UserContext);
   const formatAddress = `${userContext.location?.name}, ${userContext.location?.city} ${userContext.location?.region}, ${userContext.location?.postalCode}`;
-
   return (
     <>
       <SafeAreaView forceInset={{ top: 'always' }} style={{ flex: 1, backgroundColor: "#eee" }}>

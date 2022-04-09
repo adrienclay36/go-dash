@@ -22,7 +22,8 @@ const Home = ({ navigation }) => {
   const animationRef = useRef(null);
   const getRestaurants = async (inputCity) => {
     
-    const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=restaurants&location=${inputCity}`;
+    const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=restaurants&location=${inputCity}&limit=50`;
+    
     const apiOptions = {
       headers: {
         Authorization: `Bearer ${YELP_API_KEY}`,
@@ -36,6 +37,7 @@ const Home = ({ navigation }) => {
         business.transactions.includes(activeTab.toLowerCase())
       )
     );
+    
     
     if(init) {
       setInit(false);
