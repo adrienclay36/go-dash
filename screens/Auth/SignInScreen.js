@@ -24,7 +24,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
-
+import LoadingAnimation from "../../components/LoadingAnimation";
 const loginFormSchema = Yup.object().shape({
   email: Yup.string().email().required("An email address is required"),
   password: Yup.string()
@@ -49,6 +49,17 @@ const SignInScreen = ({ navigation, route }) => {
       setLoading(false);
     }
   };
+
+
+  if (loading) {
+    return (
+      <LoadingAnimation
+        loading={loading}
+        source={require("../../assets/animations/auth-loader.json")}
+        speed={0.5}
+      />
+    );
+  }
 
   return (
     <>

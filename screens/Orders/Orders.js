@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity,  } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import {
@@ -9,7 +10,8 @@ import {
   onSnapshot,
   query,
 } from "firebase/firestore";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
+import OrdersHeader from "../../components/Orders/OrdersHeader";
 const Orders = ({ navigation }) => {
   const [userOrders, setUserOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,15 +34,23 @@ const Orders = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      {userOrders?.map((order, index) => (
-        <OrderItem
-          key={order.createdAt}
-          order={order}
-          navigation={navigation}
+    <>
+    <SafeAreaView>
+      <OrdersHeader />
+      </SafeAreaView>
+      <FlatList
+      keyExtractor={(itemData) => itemData.createdAt}
+      
+      showsVerticalScrollIndicator={false}
+        data={userOrders}
+        renderItem={(itemData) => (
+          <OrderItem
+            order={itemData.item}
+            navigation={navigation}
+          />
+        )}
         />
-      ))}
-    </ScrollView>
+        </>
   );
 };
 

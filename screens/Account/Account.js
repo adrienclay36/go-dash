@@ -1,62 +1,91 @@
 import { StyleSheet, Text, View, Image } from "react-native";
-import { auth } from "../../firebase";
-import React, { useContext } from "react";
+import React, { useContext, useCallback, useRef } from "react";
 import Header from "../../components/Account/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserContext } from "../../context/UserContext";
-const Account = () => {
+import LocationItem from "../../components/Account/LocationItem";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import Octicons from "react-native-vector-icons/Octicons";
+import { doc, updateDoc, arrayRemove } from "firebase/firestore";
+import { auth, db } from "../../firebase";
+const Account = ({ navigation, route }) => {
   const userContext = useContext(UserContext);
-  const formatAddress = `${userContext.location?.name}, ${userContext.location?.city} ${userContext.location?.region}, ${userContext.location?.postalCode}`;
+  const scrollRef = useRef(null);
+
+  const onDismiss = useCallback(async (location) => {
+    try {
+      const userRef = doc(db, "users", auth.currentUser?.email);
+      await updateDoc(userRef, {
+        location: arrayRemove(location),
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, []);
+
   return (
     <>
-      <SafeAreaView forceInset={{ top: 'always' }} style={{ flex: 1, backgroundColor: "#eee" }}>
+      <SafeAreaView
+        forceInset={{ top: "always" }}
+        style={{ flex: 1, backgroundColor: "#eee" }}
+      >
         <Header />
-        <View>
-          <ProfilePicture />
-          <UserInfo />
-        </View>
+        <ScrollView ref={scrollRef}>
+          <View>
+            <ProfilePicture />
+            <UserInfo />
+          </View>
 
-        <View>
-          <Text
-            style={{
-              padding: 10,
-              textTransform: "uppercase",
-              fontWeight: "600",
-            }}
-          >
-            Saved Places
-          </Text>
-          <View
-            style={{
-              borderTopColor: "#ccc",
-              borderWidth: 1,
-              borderBottomColor: "#ccc",
-            }}
-          >
-            <View
+          <View>
+            <Text
               style={{
-                flexDirection: "row",
-                padding: 20,
-                backgroundColor: "white",
+                padding: 10,
+                textTransform: "uppercase",
+                fontWeight: "600",
               }}
             >
-              <Image
-                source={{
-                  uri: "https://img.icons8.com/color/344/home--v1.png",
-                }}
-                style={{ height: 50, width: 50, marginRight: 20 }}
+              Saved Places
+            </Text>
+            {userContext.locations.map((location, index) => (
+              <LocationItem
+                simultaneousHandler={scrollRef}
+                onDismiss={onDismiss}
+                location={location}
+                key={index}
               />
-              <View>
-                <Text style={{ fontSize: 17 }}>
-                  {userContext.location?.label}
-                </Text>
-                <Text style={{ color: "gray", fontWeight: "600" }}>
-                  {formatAddress}
+            ))}
+          </View>
+
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginVertical: 15,
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.navigate("AddPlace")}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Octicons
+                  name="plus"
+                  size={20}
+                  color="gray"
+                  style={{ marginRight: 5 }}
+                />
+                <Text
+                  style={{ color: "gray", fontWeight: "600", fontSize: 18 }}
+                >
+                  Add Place
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );

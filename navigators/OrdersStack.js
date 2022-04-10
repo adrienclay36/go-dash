@@ -7,7 +7,7 @@ import OrderDetails from "../screens/Orders/OrderDetails";
 const OrdersStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Orders" component={Orders} />
+      <Stack.Screen options={{ headerShown: false }} name="Orders" component={Orders} />
       <Stack.Screen
         options={{ headerShown: false }}
         name="OrderDetails"

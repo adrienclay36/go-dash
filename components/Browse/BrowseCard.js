@@ -2,7 +2,6 @@ import { Image, StyleSheet, Text, View , Dimensions} from "react-native";
 import React from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 const ITEM_HEIGHT = Dimensions.get('window').height * .075;
-console.log(ITEM_HEIGHT)
 const BrowseCard = ({ title, image, navigation, navigationParams }) => {
   return (
     <TouchableOpacity onPress={() => navigation.push('CategoryDetails', navigationParams)}>

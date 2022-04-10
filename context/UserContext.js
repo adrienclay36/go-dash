@@ -3,13 +3,15 @@ import { auth, db } from "../firebase";
 import { getDoc, doc, onSnapshot } from "firebase/firestore";
 export const UserContext = createContext({
   user: {},
-  location: {},
+  locations: {},
   favorites: [],
+  orders: [],
 });
 
 const UserContextProvider = (props) => {
   const [user, setUser] = useState(null);
-  const [location, setLocation] = useState({ city: "San Francisco" });
+  const [locations, setLocations] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   const [favorites, setFavorites] = useState([]);
 
@@ -20,6 +22,10 @@ const UserContextProvider = (props) => {
       if (snapshot.exists()) {
         const fetchedFavorites = snapshot.data().favorites;
         setFavorites(fetchedFavorites);
+        setUser(snapshot.data());
+        setLocations(snapshot.data().location);
+        setOrders(snapshot.data().orders);
+        
       }
     });
     return () => unsub();
@@ -27,29 +33,12 @@ const UserContextProvider = (props) => {
 
   }, [auth.currentUser]);
 
-  const getUser = async () => {
-    try {
-      const userRef = doc(db, "users", auth.currentUser?.email);
-      const docSnap = await getDoc(userRef);
-      if (docSnap.exists()) {
-        setUser(docSnap.data());
-        setLocation(docSnap.data().location[0]);
 
-      } else {
-        setUser(null);
-      }
-    } catch (err) {
-      console.log("USER CONTEXT:: ", err.message);
-    }
-  };
 
-  useEffect(() => {
-    if (auth?.currentUser) {
-      getUser();
-    }
-  }, []);
+
+
   return (
-    <UserContext.Provider value={{ user, location, favorites }}>
+    <UserContext.Provider value={{ user, locations, favorites, orders }}>
       {props.children}
     </UserContext.Provider>
   );

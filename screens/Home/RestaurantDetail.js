@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useRef, useState } from "react";
 import About from "../../components/RestaurantDetail/About";
 import { Divider } from "react-native-elements";
 import MenuItems from "../../components/RestaurantDetail/MenuItems";
 import ViewCart from "../../components/RestaurantDetail/ViewCart";
 import DetailsMap from "../../components/RestaurantDetail/DetailsMap";
-
+import LoadingAnimation from "../../components/LoadingAnimation";
 const foods = [
   {
     title: "Lasagna",
@@ -47,18 +47,26 @@ const foods = [
 ];
 
 const RestaurantDetail = ({ navigation, route }) => {
+  const [loading, setLoading] = useState(false);
+
+  if (loading) {
+    return <LoadingAnimation loading={loading} />;
+  }
+
   return (
     <>
-    <View style={{ flex: .3, }}>
-
-      <DetailsMap coordinates={route?.params?.coordinates} restaurantName={route?.params?.name} />
-    </View>
-    <View style={{ flex: 1 }}>
-      <About route={route} />
-      <Divider width={1.8} style={{ marginVertical: 20 }} />
-      <MenuItems restaurantName={route.params?.name} foods={foods} />
-      <ViewCart navigation={navigation} />
-    </View>
+      <View style={{ flex: 0.3 }}>
+        <DetailsMap
+          coordinates={route?.params?.coordinates}
+          restaurantName={route?.params?.name}
+        />
+      </View>
+      <View style={{ flex: 1 }}>
+        <About route={route} />
+        <Divider width={1.8} style={{ marginVertical: 20 }} />
+        <MenuItems restaurantName={route.params?.name} foods={foods} />
+        <ViewCart navigation={navigation} setPageLoading={setLoading} />
+      </View>
     </>
   );
 };

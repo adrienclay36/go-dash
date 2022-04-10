@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import OrderItem from "./OrderItem";
 import LottieView from "lottie-react-native";
-const ViewCart = ({ navigation }) => {
+const ViewCart = ({ navigation, setPageLoading }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const loadingRef = useRef(null);
@@ -72,7 +72,7 @@ const ViewCart = ({ navigation }) => {
 
   const addOrderToFirebase = async () => {
     setModalVisible(false);
-    setLoading(true);
+    setPageLoading(true);
     loadingRef.current?.play();
     const ordersCol = collection(db, "orders");
     const userRef = doc(db, "users", auth.currentUser?.email);
@@ -86,7 +86,7 @@ const ViewCart = ({ navigation }) => {
     });
     dispatch({ type: "CLEAR_CART" });
     navigation.replace("OrderCompleted", { restaurantName, totalUSD });
-    setLoading(false);
+    setPageLoading(false);
   };
 
   const checkoutModalContent = (setModalVisible) => {

@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import OrderItem from "../RestaurantDetail/OrderItem";
 import LottieView from "lottie-react-native";
-const ViewGroceryCart = ({ navigation, hideViewButton, rootPage }) => {
+const ViewGroceryCart = ({ navigation, hideViewButton, rootPage, setPageLoading, }) => {
   const { groceryCart, restaurantName, groceryCartOpen } = useSelector(
     (state) => state.cartReducer.selectedItems
   );
@@ -72,7 +72,7 @@ const ViewGroceryCart = ({ navigation, hideViewButton, rootPage }) => {
 
   const addOrderToFirebase = async () => {
     setModalVisible(false);
-    setLoading(true);
+    setPageLoading(true);
     loadingRef.current?.play();
     const userRef = doc(db, "users", auth.currentUser?.email);
     await updateDoc(userRef, {
@@ -90,7 +90,7 @@ const ViewGroceryCart = ({ navigation, hideViewButton, rootPage }) => {
     } else {
       navigation.replace("OrderCompleted", { restaurantName, totalUSD });
     }
-    setLoading(false);
+    setPageLoading(false);
   };
 
   useEffect(() => {

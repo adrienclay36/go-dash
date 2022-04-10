@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import ViewGroceryCart from "./ViewGroceryCart";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -9,14 +9,14 @@ const GroceryHeader = ({ navigation }) => {
     (state) => state.cartReducer.selectedItems
   );
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const openCart = () => {
-    if(groceryCartOpen){
+    if (groceryCartOpen) {
       dispatch({ type: "CLOSE_GROCERY" });
-
     }
-    if(!groceryCartOpen) {
-      dispatch({type: 'OPEN_GROCERY'})
+    if (!groceryCartOpen) {
+      dispatch({ type: "OPEN_GROCERY" });
     }
   };
 
@@ -29,26 +29,17 @@ const GroceryHeader = ({ navigation }) => {
           alignItems: "center",
         }}
       >
-        <TouchableOpacity onPress={openCart}>
-          <View>
-            {groceryCart.length > 0 && (
-              <View style={styles.badge}>
-                <Text style={{ color: "white", fontWeight: "600" }}>
-                  {groceryCart.length}
-                </Text>
-              </View>
-            )}
+        <View>
 
-            <Image
-              source={{
-                uri: "https://img.icons8.com/color/344/shopping-basket-2.png",
-              }}
-              style={{ width: 50, height: 50, marginTop: 30 }}
-            />
-          </View>
-        </TouchableOpacity>
+
+          <Image
+            source={{
+              uri: "https://img.icons8.com/color/344/shopping-basket-2.png",
+            }}
+            style={{ width: 50, height: 50, marginTop: 30 }}
+          />
+        </View>
       </View>
-      <ViewGroceryCart navigation={navigation} hideViewButton={true} rootPage={'GroceryHeader'} />
     </>
   );
 };

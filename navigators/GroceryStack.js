@@ -12,7 +12,6 @@ const GroceryStack = () => {
       <Stack.Screen
         options={({ route }) => ({
           headerShadowVisible: false,
-          presentation: "formSheet",
           header: (props) => (
             <GroceryHeader {...props} props={props} route={route} />
           ),

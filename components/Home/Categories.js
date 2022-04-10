@@ -1,30 +1,35 @@
 import { StyleSheet, Text, View, ScrollView, Image } from "react-native";
 import React from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const items = [
   {
     image: require("../../assets/images/shopping-bag.png"),
-    text: "Pick-up",
+    text: "All",
   },
   {
-    image: require("../../assets/images/soft-drink.png"),
-    text: "Soft Drinks",
+    image: require("../../assets/images/burgers.png"),
+    text: "Burgers",
   },
   {
-    image: require("../../assets/images/bread.png"),
-    text: "Bakery Items",
+    image: require("../../assets/images/pizza.png"),
+    text: "Pizza",
   },
   {
-    image: require("../../assets/images/fast-food.png"),
-    text: "Fast Foods",
+    image: require("../../assets/images/salad.png"),
+    text: "Salads",
   },
   {
-    image: require("../../assets/images/deals.png"),
-    text: "Deals",
+    image: require("../../assets/images/steak.png"),
+    text: "Steak",
   },
   {
-    image: require("../../assets/images/coffee.png"),
-    text: "Coffee & Tea",
+    image: require("../../assets/images/mexico.png"),
+    text: "Mexican",
+  },
+  {
+    image: require("../../assets/images/italy.png"),
+    text: "Italian",
   },
   {
     image: require("../../assets/images/desserts.png"),
@@ -32,22 +37,33 @@ const items = [
   },
 ];
 
-const Categories = () => {
+const Categories = ({ setCurrentCategory }) => {
   return (
-    <View style={{ marginTop: 5, backgroundColor: '#fff', paddingLeft: 20, paddingVertical: 10,}}>
+    <View
+      style={{
+        marginTop: 5,
+        backgroundColor: "#fff",
+        paddingLeft: 20,
+        paddingVertical: 10,
+      }}
+    >
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {items.map((item) => (
-          <View
+          <TouchableOpacity
             key={item.text}
-            style={{ alignItems: "center", marginRight: 30 }}
+            onPress={() => setCurrentCategory(item.text)}
           >
-            <Image
-              source={item.image}
-              style={{ width: 50, height: 40 }}
-              resizeMode="contain"
-            />
-            <Text style={{ fontSize: 13, fontWeight: "900" }}>{item.text}</Text>
-          </View>
+            <View style={{ alignItems: "center", marginRight: 30 }}>
+              <Image
+                source={item.image}
+                style={{ width: 50, height: 40 }}
+                resizeMode="contain"
+              />
+              <Text style={{ fontSize: 13, fontWeight: "900" }}>
+                {item.text}
+              </Text>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>

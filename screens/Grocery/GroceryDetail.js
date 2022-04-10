@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import About from "../../components/RestaurantDetail/About";
 import { Divider } from "react-native-elements";
 import ProductItems from "../../components/Grocery/ProductItems";
-import ViewCart from "../../components/RestaurantDetail/ViewCart";
 import ViewGroceryCart from "../../components/Grocery/ViewGroceryCart";
 import DetailsMap from "../../components/RestaurantDetail/DetailsMap";
+import LoadingAnimation from "../../components/LoadingAnimation";
 
 const foods = [
   {
@@ -32,6 +32,12 @@ const foods = [
 ];
 
 const RestaurantDetail = ({ navigation, route }) => {
+  const [loading, setLoading] = useState(false);
+
+  if (loading) {
+    return <LoadingAnimation loading={loading} />;
+  }
+
   return (
     <>
       <View style={{ flex: 0.3 }}>
@@ -44,7 +50,7 @@ const RestaurantDetail = ({ navigation, route }) => {
         <About route={route} />
         <Divider width={1.8} style={{ marginVertical: 20 }} />
         <ProductItems restaurantName={route.params?.name} foods={foods} />
-        <ViewGroceryCart navigation={navigation} />
+        <ViewGroceryCart setPageLoading={setLoading} navigation={navigation} />
       </View>
     </>
   );

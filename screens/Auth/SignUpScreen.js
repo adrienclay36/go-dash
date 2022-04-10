@@ -27,7 +27,8 @@ import {
 import { GOOGLE_API } from "@env";
 
 import * as Location from "expo-location";
-
+import uuid from 'react-native-uuid';
+import LoadingAnimation from "../../components/LoadingAnimation";
 Location.setGoogleApiKey(GOOGLE_API);
 
 const loginFormSchema = Yup.object().shape({
@@ -59,7 +60,9 @@ const SignUpScreen = ({ navigation, route }) => {
     setLoading(true);
     const permissions = await getLocationPermissions();
     let regionName;
-    let locationObj
+    let locationObj;
+    let label;
+    let formatAddress;
     if (permissions) {
       const location = await Location.getCurrentPositionAsync();
 
@@ -68,11 +71,8 @@ const SignUpScreen = ({ navigation, route }) => {
         longitude: location.coords.longitude,
       });
       locationObj = regionName[0];
-    } else {
-      regionName = [{
-        city: 'San Francisco',
-      }];
-      locationObj = regionName[0];
+      label = "Home";
+      formatAddress = `${locationObj?.name}, ${locationObj?.city} ${locationObj?.region}, ${locationObj?.isoCountryCode}`;
     }
 
     await createUserWithEmailAndPassword(auth, email, password);
@@ -80,7 +80,12 @@ const SignUpScreen = ({ navigation, route }) => {
       displayName,
       photoURL: PHOTO_URL,
     });
-    
+    let finalLocation;
+    if (formatAddress && label) {
+      finalLocation = [{ id: uuid.v4(), location: formatAddress, label: label }];
+    } else {
+      finalLocation = [];
+    }
     try {
       const usersRef = doc(db, "users", auth.currentUser?.email);
       await setDoc(usersRef, {
@@ -90,13 +95,17 @@ const SignUpScreen = ({ navigation, route }) => {
         photoURL: PHOTO_URL,
         orders: [],
         favorites: [],
-        location: [{ ...locationObj, label: "Home" }],
+        location: finalLocation,
       });
     } catch (err) {
       console.log(err.message);
       setLoading(false);
     }
   };
+
+  if(loading) {
+    return <LoadingAnimation loading={loading} source={require("../../assets/animations/auth-loader.json")} speed={.5} />
+  }
 
   return (
     <KeyboardAvoidingView

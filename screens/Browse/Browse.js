@@ -165,7 +165,7 @@ const FavoritesCard = ({ item, navigation, favorites }) => {
                 fontWeight: restaurantClosed ? "300" : "bold",
               }}
             >
-              {restaurantClosed ? "Closed" : "Open Now"}
+              {item.price ? item.price : '$$'}
             </Text>
           </View>
         </View>

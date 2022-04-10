@@ -71,7 +71,7 @@ const RestaurantItems = ({ restaurantData, navigation }) => {
             <RestaurantInfo
               name={item.name}
               rating={item.rating}
-              isClosed={item.is_closed}
+              price={item.price}
             />
           </View>
         </TouchableOpacity>
@@ -144,7 +144,7 @@ const RestaurantImage = ({ image, item, favorites }) => {
   );
 };
 
-const RestaurantInfo = ({ name, rating, isClosed }) => (
+const RestaurantInfo = ({ name, rating, price }) => (
   <View
     style={{
       flexDirection: "row",
@@ -164,23 +164,25 @@ const RestaurantInfo = ({ name, rating, isClosed }) => (
         alignItems: "center",
       }}
     >
-      {isClosed ? (
-        <View
-          style={{ backgroundColor: "#e62538", padding: 10, borderRadius: 15 }}
+      <View
+        style={{
+          padding: 1,
+          borderRadius: 20,
+          backgroundColor: "#00c753",
+          margin: 5,
+        }}
+      >
+        <Text
+          style={{
+            margin: 10,
+            color: "white",
+            fontSize: 12,
+            fontWeight: "bold",
+          }}
         >
-          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
-            Closed
-          </Text>
-        </View>
-      ) : (
-        <View
-          style={{ backgroundColor: "#25e685", padding: 10, borderRadius: 15 }}
-        >
-          <Text style={{ fontSize: 13, color: "white", fontWeight: "700" }}>
-            Open
-          </Text>
-        </View>
-      )}
+          {price ? price : '$$'}
+        </Text>
+      </View>
       <View
         style={{
           backgroundColor: "#eee",

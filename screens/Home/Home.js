@@ -19,6 +19,7 @@ const Home = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState("Delivery");
   const [init, setInit] = useState(true);
   const [business, setBusiness] = useState("");
+  const [currentCategory, setCurrentCategory] = useState("All");
   const animationRef = useRef(null);
 
   
@@ -40,6 +41,7 @@ const Home = ({ navigation }) => {
       )
     );
 
+
     if (init) {
       setInit(false);
     }
@@ -58,7 +60,6 @@ const Home = ({ navigation }) => {
 
     const response = await fetch(yelpUrl, apiOptions);
     const data = await response.json();
-    console.log(data);
     if (!data?.error) {
       setRestaurantData(
         data.businesses.filter((business) =>
@@ -139,6 +140,17 @@ const Home = ({ navigation }) => {
     }
   }, [business]);
 
+
+  useEffect(() => {
+    if(!init && currentCategory !== 'All') {
+      findBusiness(currentCategory, city);
+    }
+    if(!init && currentCategory === 'All') {
+      setLoading(true);
+      getRestaurants(city);
+    }
+  }, [currentCategory])
+
   const loadingAnimation = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <LottieView
@@ -158,7 +170,7 @@ const Home = ({ navigation }) => {
         <SearchBar setCity={setCity} setBusiness={setBusiness} business={business}/>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Categories />
+        <Categories setCurrentCategory={setCurrentCategory} />
         {loading ? (
           loadingAnimation
         ) : (
