@@ -1,23 +1,24 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
-import { YELP_API_KEY } from "@env";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { doc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db, auth } from "../../firebase";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import BrowseCard from "../../components/Browse/BrowseCard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native-gesture-handler";
+import { UserContext } from "../../context/UserContext";
+import Carousel from "react-native-snap-carousel";
 const Browse = ({ navigation, route }) => {
-  const [favorites, setFavorites] = useState([]);
-
-  useEffect(() => {
-    const userRef = doc(db, "users", auth.currentUser?.email);
-    const snapshot = onSnapshot(userRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const fetchedFavorites = snapshot.data().favorites;
-        setFavorites(fetchedFavorites);
-      }
-    });
-  }, []);
+  const userContext = useContext(UserContext);
+  const isCarousel = useRef(null);
 
   const renderCategory = (itemData) => {
     return (
@@ -33,9 +34,11 @@ const Browse = ({ navigation, route }) => {
 
   return (
     <SafeAreaView>
+      <ScrollView>
+
       <View>
-        <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Styles</Text>
+        <View style={{ paddingHorizontal: 20, marginVertical: 5 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Styles </Text>
         </View>
         <FlatList
           keyExtractor={(item, index) => index}
@@ -46,7 +49,7 @@ const Browse = ({ navigation, route }) => {
         />
       </View>
       <View>
-        <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+        <View style={{ paddingHorizontal: 20, marginVertical: 5 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             Establishment Type
           </Text>
@@ -59,7 +62,115 @@ const Browse = ({ navigation, route }) => {
           showsHorizontalScrollIndicator={false}
         />
       </View>
+
+      <View>
+        <View style={{ paddingHorizontal: 20, marginVertical: 5 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Favorites ❤️</Text>
+        </View>
+        <Carousel
+          ref={isCarousel}
+          sliderWidth={Dimensions.get("window").width}
+          windowSize={Dimensions.get("window").width}
+          itemWidth={Dimensions.get("window").width - 40}
+          data={userContext.favorites}
+          layout="stack"
+          renderItem={(itemData) => (
+            <FavoritesCard
+              favorites={userContext.favorites}
+              key={itemData.item.restaurant.id}
+              item={itemData.item.restaurant}
+              navigation={navigation}
+            />
+          )}
+        />
+      </View>
+  </ScrollView>
     </SafeAreaView>
+  );
+};
+
+const FavoritesCard = ({ item, navigation, favorites }) => {
+  const restaurantClosed = item.is_closed;
+
+  const removeFromFavorites = async () => {
+    const userRef = doc(db, "users", auth.currentUser?.email);
+    if (favorites.length === 1) {
+      await updateDoc(userRef, {
+        favorites: [],
+      });
+    }
+    await updateDoc(userRef, {
+      favorites: arrayRemove({
+        restaurant: item,
+      }),
+    });
+  };
+  return (
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() =>
+        navigation.navigate("RestaurantDetail", {
+          name: item.name,
+          image: item.image_url,
+          price: item.price,
+          reviews: item.review_count,
+          rating: item.rating,
+          categories: item.categories,
+          coordinates: item.coordinates,
+        })
+      }
+    >
+      <View style={{ backgroundColor: "white", borderRadius: 15, margin: 10 }}>
+        <TouchableOpacity
+          onPress={removeFromFavorites}
+          style={{ position: "absolute", zIndex: 999, right: 10, top: 10, }}
+        >
+          <MaterialCommunityIcons name={"heart"} size={30} color="#ed2d53" />
+        </TouchableOpacity>
+        <Image
+          source={{ uri: item.image_url }}
+          style={{
+            height: Dimensions.get("window").height * 0.15,
+            width: "100%",
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+          }}
+          resizeMode="cover"
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginHorizontal: 5,
+            marginVertical: 10,
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "600", margin: 10 }}>
+            {item.name}
+          </Text>
+          <View
+            style={{
+              padding: 1,
+              borderRadius: 20,
+              backgroundColor: restaurantClosed ? "#eb3449" : "#00c753",
+              margin: 5,
+            }}
+          >
+            <Text
+              style={{
+                margin: 10,
+                color: "white",
+                fontSize: 12,
+                fontWeight: restaurantClosed ? "300" : "bold",
+              }}
+            >
+              {restaurantClosed ? "Closed" : "Open Now"}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
