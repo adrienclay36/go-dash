@@ -6,38 +6,57 @@ const items = [
   {
     image: require("../../assets/images/shopping-bag.png"),
     text: "All",
+    category: 'All',
   },
   {
     image: require("../../assets/images/burgers.png"),
     text: "Burgers",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/pizza.png"),
     text: "Pizza",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/salad.png"),
     text: "Salads",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/steak.png"),
     text: "Steak",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/mexico.png"),
     text: "Mexican",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/italy.png"),
     text: "Italian",
+    category: "restaurants",
   },
   {
     image: require("../../assets/images/desserts.png"),
     text: "Desserts",
+    category: "restaurants",
+  },
+  {
+    image: require("../../assets/images/bakery.png"),
+    text: "Bakery",
+    category: "grocery",
+  },
+  {
+    image: require("../../assets/images/supermarket.png"),
+    text: "Supermarket",
+    category: "grocery",
   },
 ];
 
-const Categories = ({ setCurrentCategory }) => {
+const Categories = ({ setCurrentCategory, itemType }) => {
+  const data = items.filter((item) => item.category === itemType || item.category === 'All');
   return (
     <View
       style={{
@@ -48,7 +67,7 @@ const Categories = ({ setCurrentCategory }) => {
       }}
     >
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {items.map((item) => (
+        {data.map((item) => (
           <TouchableOpacity
             key={item.text}
             onPress={() => setCurrentCategory(item.text)}

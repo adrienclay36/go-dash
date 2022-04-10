@@ -17,6 +17,7 @@ const Grocery = ({ navigation }) => {
   const [business, setBusiness] = useState("");
   const [init, setInit] = useState(true);
   const animationRef = useRef(null);
+  const [currentCategory, setCurrentCategory] = useState("All");
 
   const getGroceryData = async (inputCity) => {
     const yelpUrl = `https://api.yelp.com/v3/businesses/search?term=grocery&location=${inputCity}&limit=50`;
@@ -136,6 +137,16 @@ const Grocery = ({ navigation }) => {
     </View>
   );
 
+  useEffect(() => {
+    if (!init && currentCategory !== "All") {
+      findBusiness(currentCategory, city);
+    }
+    if (!init && currentCategory === "All") {
+      setLoading(true);
+      getGroceryData(city);
+    }
+  }, [currentCategory]);
+
   return (
     <SafeAreaView style={{ backgroundColor: "#eee", flex: 1 }}>
       <View style={{ backgroundColor: "white", padding: 15 }}>
@@ -147,7 +158,7 @@ const Grocery = ({ navigation }) => {
         />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Categories />
+        <Categories setCurrentCategory={setCurrentCategory} itemType={'grocery'} />
         {loading ? (
           loadingAnimation
         ) : (

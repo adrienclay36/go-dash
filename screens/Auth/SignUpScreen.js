@@ -40,7 +40,7 @@ const loginFormSchema = Yup.object().shape({
   displayName: Yup.string().required().min(4, "A display name is required"),
 });
 const PHOTO_URL =
-  "https://img.icons8.com/dusk/344/circled-user-male-skin-type-4.png";
+  "https://img.icons8.com/external-flaticons-lineal-color-flat-icons/344/fa314a/external-user-web-flaticons-lineal-color-flat-icons.png";
 const SignUpScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
 

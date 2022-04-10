@@ -170,7 +170,7 @@ const Home = ({ navigation }) => {
         <SearchBar setCity={setCity} setBusiness={setBusiness} business={business}/>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Categories setCurrentCategory={setCurrentCategory} />
+        <Categories setCurrentCategory={setCurrentCategory} itemType={'restaurants'} />
         {loading ? (
           loadingAnimation
         ) : (
