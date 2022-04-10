@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "uber-eats-clone",
-    "slug": "uber-eats-clone",
+    "name": "go-dash",
+    "slug": "go-dash",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,12 +13,10 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.adrienclay.uber-eats-clone"
+      "bundleIdentifier": "com.adrienclay.go-dash"
     },
     "android": {
       "adaptiveIcon": {
